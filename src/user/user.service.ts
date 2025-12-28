@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
 import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -8,12 +9,13 @@ import { Model } from 'mongoose';
 @Injectable()
 export class UserService {
   constructor(@InjectModel(User.name) private userModel: Model<User>) {}
-  create(createUserDto: CreateUserDto) {
-    return this.userModel.create(createUserDto);
+  create(createUserDto: CreateUserDto, payload) {
+    const password=
+    return 'Ok'; //this.userModel.create({ ...createUserDto, ...payload });
   }
 
   findAll() {
-    return 'This action returns all user';
+    return this.userModel.find();
   }
 
   findOne(id: number) {

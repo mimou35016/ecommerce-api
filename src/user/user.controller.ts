@@ -6,18 +6,32 @@ import {
   Patch,
   Param,
   Delete,
+  ValidationPipe,
+  UseGuards,
+  Req,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { AuthGuard } from './guard/Auth.guard';
+import { Roles } from './decorator/Roles.decorator';
 
-@Controller('user')
+@Controller('v1/user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
-
+  // Docs Create User - Only admin can create user
+  // Route: POST:/api/v1/user
+  // access: Private (admin)
   @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.userService.create(createUserDto);
+  @Roles(['admin'])
+  @UseGuards(AuthGuard)
+  create(
+    @Body(new ValidationPipe({ forbidNonWhitelisted: true }))
+    createUserDto: CreateUserDto,
+    @Req() req,
+  ) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    return this.userService.create(createUserDto, req.user);
   }
 
   @Get()
