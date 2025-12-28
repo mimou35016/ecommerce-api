@@ -8,7 +8,6 @@ import {
   Delete,
   ValidationPipe,
   UseGuards,
-  Req,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -28,10 +27,8 @@ export class UserController {
   create(
     @Body(new ValidationPipe({ forbidNonWhitelisted: true }))
     createUserDto: CreateUserDto,
-    @Req() req,
   ) {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-    return this.userService.create(createUserDto, req.user);
+    return this.userService.create(createUserDto);
   }
 
   @Get()
