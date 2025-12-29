@@ -134,6 +134,7 @@ export class UserService {
 
   async getMe(payload) {
     if (!payload._id) {
+      console.log(payload.id);
       throw new NotFoundException('User not found');
     }
     const user = await this.userModel

@@ -14,7 +14,7 @@ import {
 } from 'class-validator';
 
 export class CreateUserDto {
-  // Email
+  // Name
   @IsString({ message: 'Name must be a string' })
   @MinLength(3, { message: 'Name must be at least 3 characters long' })
   @MaxLength(30, { message: 'Name can be at most 30 characters long' })
