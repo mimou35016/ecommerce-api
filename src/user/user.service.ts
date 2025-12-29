@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -28,7 +30,6 @@ export class UserService {
       role: createUserDto.role ?? 'user',
       active: true,
     };
-    console.log({ ...user, ...createUserDto });
     return {
       status: 201,
       message: 'User created successfully',
@@ -36,8 +37,35 @@ export class UserService {
     };
   } //
 
-  findAll() {
-    return this.userModel.find().select('-password -__v');
+  async findAll(query) {
+    const { _limit, skip, sort, name, email, role } = query;
+
+    if (Number.isNaN(Number(+_limit)) && _limit !== undefined) {
+      throw new HttpException('limit must be a number', 400);
+    }
+    if (Number.isNaN(Number(+skip)) && skip !== undefined) {
+      throw new HttpException('skip must be a number', 400);
+    }
+    if (!['asc', 'desc'].includes(sort) && sort !== undefined) {
+      throw new HttpException('sort must be asc or desc', 400);
+    }
+
+    const users = await this.userModel
+      .find()
+      .skip(skip)
+      .limit(_limit)
+      .where('name', new RegExp(name, 'i'))
+      .where('email', new RegExp(email, 'i'))
+      .where('role', new RegExp(role, 'i'))
+      .sort({ name: sort || 'asc' })
+      .select('-password -__v')
+      .exec();
+    return {
+      status: 200,
+      message: ' Users found successfully',
+      length: users.length,
+      data: users,
+    };
   }
 
   async findOne(id: string): Promise<{

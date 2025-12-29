@@ -8,6 +8,7 @@ import {
   Delete,
   ValidationPipe,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -37,8 +38,8 @@ export class UserController {
   @Roles(['admin'])
   @UseGuards(AuthGuard)
   @Get()
-  findAll() {
-    return this.userService.findAll();
+  findAll(@Query() query) {
+    return this.userService.findAll(query);
   }
 
   // Docs Get One User - Only admin can Get One user
