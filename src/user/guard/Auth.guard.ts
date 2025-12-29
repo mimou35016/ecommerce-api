@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
@@ -38,8 +37,13 @@ export class AuthGuard implements CanActivate {
         secret: process.env.JWT_SECRET,
       });
 
+      if (payload._id) {
+        request['user'] = payload;
+        return true;
+      }
+
       if (
-        payload.role == null ||
+        !payload.role ||
         payload.role === '' ||
         !roles.includes(payload.role)
       ) {
@@ -60,3 +64,4 @@ export class AuthGuard implements CanActivate {
     return type === 'Bearer' ? token : undefined;
   }
 }
+//

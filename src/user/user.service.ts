@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -129,5 +130,73 @@ export class UserService {
       status: 200,
       message: 'User deleted successfully',
     };
+  }
+
+  async getMe(payload) {
+    if (!payload._id) {
+      throw new NotFoundException('User not found');
+    }
+    const user = await this.userModel
+      .findById(payload._id)
+      .select('-password -__v');
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    return {
+      status: 200,
+      message: 'User profile fetched successfully',
+      data: user,
+    };
+  }
+
+  async updateMe(payload, updateUserDto: UpdateUserDto) {
+    if (!payload._id) {
+      throw new NotFoundException('User not found');
+    }
+    const user = await this.userModel
+      .findById(payload._id)
+      .select('-password -__v');
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    let updatedUser = {
+      ...updateUserDto,
+    };
+    if (updateUserDto.password) {
+      const password = await bcrypt.hash(updateUserDto.password, saltOrRounds);
+      updatedUser = {
+        ...updatedUser,
+        password,
+      };
+    }
+    return {
+      status: 200,
+      message: 'User profile updated successfully',
+      data: await this.userModel
+        .findByIdAndUpdate(payload._id, updatedUser, {
+          new: true,
+        })
+        .select('-password -__v'),
+    };
+  }
+
+  async deleteMe(payload): Promise<{ message: string }> {
+    if (!payload._id) {
+      throw new NotFoundException('User not found');
+    }
+    const user = await this.userModel
+      .findById(payload._id)
+      .select('-password -__v');
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    await this.userModel.findByIdAndUpdate(
+      payload._id,
+      { active: false },
+      {
+        new: true,
+      },
+    );
+    return { message: 'Your account has been Deleted Successfully' };
   }
 }

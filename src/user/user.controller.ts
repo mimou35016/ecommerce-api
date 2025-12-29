@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
 import {
   Controller,
   Get,
@@ -9,6 +11,7 @@ import {
   ValidationPipe,
   UseGuards,
   Query,
+  Req,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -74,5 +77,41 @@ export class UserController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.userService.remove(id);
+  }
+}
+@Controller('v1/userMe')
+export class UserMeController {
+  constructor(private readonly userService: UserService) {}
+  // Docs Get Profile - Logged in user can get his profile
+  // Route: GET:/api/v1/user/me
+  // access: Private (user, admin)
+  @Get()
+  @Roles(['admin', 'user'])
+  @UseGuards(AuthGuard)
+  getMe(@Req() req) {
+    return this.userService.getMe(req.user);
+  }
+
+  // Docs Update Profile - Logged in user can update his profile
+  // Route: PATCH:/api/v1/userMe
+  // access: Private (user, admin)
+  @Patch()
+  @Roles(['admin', 'user'])
+  @UseGuards(AuthGuard)
+  updateMe(
+    @Req() req,
+    @Body(new ValidationPipe({ forbidNonWhitelisted: true }))
+    updateUserDto: UpdateUserDto,
+  ) {
+    return this.userService.updateMe(req.user, updateUserDto);
+  }
+  // Docs Delete Profile - Logged in user can Delete his profile
+  // Route: DELETE:/api/v1/userMe
+  // access: Private (user, admin)
+  @Delete()
+  @Roles(['admin', 'user'])
+  @UseGuards(AuthGuard)
+  deleteMe(@Req() req) {
+    return this.userService.deleteMe(req.user);
   }
 }
