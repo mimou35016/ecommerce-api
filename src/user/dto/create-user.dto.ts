@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-call */
 import {
   IsBoolean,
   IsEmail,
@@ -74,7 +73,7 @@ export class CreateUserDto {
   @Length(6, 6, {
     message: 'VerificationCode must be at least 6 characters long',
   })
-  VerificationCode: string;
+  verificationCode: string;
 
   // Gender
   @IsOptional()

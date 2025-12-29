@@ -56,7 +56,7 @@ export class User {
   @Prop({
     type: String,
   })
-  VerificationCode: string;
+  verificationCode: string;
   @Prop({
     type: String,
     enum: ['male', 'female'],
